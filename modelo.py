@@ -1,16 +1,17 @@
 
+from conexion_bd import ConexionBD #cambiar
 from scipy.io import loadmat
+from datetime import datetime
+from skimage.morphology import skeletonize
 import numpy as np
 import pandas as pd
-from conexion_bd import ConexionBD
 import os
 import pydicom
 import dicom2nifti
 import mysql.connector
 import cv2
 import matplotlib.pyplot as plt
-from datetime import datetime
-from skimage.morphology import skeletonize
+
 
 class ModeloSenales:
     def __init__(self):
@@ -100,6 +101,7 @@ class MySQLDatabase:
             id INT AUTO_INCREMENT PRIMARY KEY,
             patient_id VARCHAR(100),
             nifti_path VARCHAR(255),
+            dicom_folder VARCHAR(255),
             num_dicoms INT,
             birth_date VARCHAR(20),
             sex VARCHAR(10),
@@ -110,11 +112,20 @@ class MySQLDatabase:
         self.conn.commit()
         print("Tabla nifti creada.")
 
+        try:
+            self.cursor.execute("ALTER TABLE nifti_conversion CHANGE dicom_path dicom_folder VARCHAR(255)")
+            self.conn.commit()
+            print("Columna renombrada a dicom_folder.")
+        except Exception as e:
+            print(f"No se pudo cambiar el nombre de la columna (posiblemente ya existe): {e}")
+
+        print("Tabla nifti creada.")
+
     def insertar_nifti(self, datos):
         sql = '''
         INSERT INTO nifti_conversion (
-            patient_id, nifti_path, num_dicoms, birth_date, sex, age
-        ) VALUES (%s, %s, %s, %s, %s, %s)
+            patient_id, nifti_path, dicom_folder, num_dicoms, birth_date, sex, age
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         '''
         self.cursor.execute(sql, datos)
         self.conn.commit()

@@ -330,6 +330,23 @@ class LoginUI(QWidget):
 
         self.setLayout(layout)
 
+class MenuImagenUI(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Menú - Experto en Imágenes")
+        self.setGeometry(100, 100, 400, 300)
+
+        self.btn_jpg_png = QPushButton("Procesar JPG/PNG")
+        self.btn_dicom = QPushButton("Visualizar DICOM")
+        self.btn_convertir_nifti = QPushButton("Convertir DICOM a NIFTI")
+
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Seleccione una acción:"))
+        layout.addWidget(self.btn_jpg_png)
+        layout.addWidget(self.btn_dicom)
+        layout.addWidget(self.btn_convertir_nifti)
+        self.setLayout(layout)
+
 
 
 if __name__ == '__main__':

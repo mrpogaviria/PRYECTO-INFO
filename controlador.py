@@ -163,6 +163,7 @@ class DicomController:
         datos = (
             str(ds.get("PatientID", "")),
             nifti_path,
+            self.processor.carpeta,
             len(dicoms),
             str(ds.get("PatientBirthDate", "")),
             str(ds.get("PatientSex", "")),
@@ -272,8 +273,13 @@ class LoginController:
 
     def abrir_interfaz_por_rol(self, rol):
         if rol == "imagen":
-            self.interfaz = InterfazGrafica()
-            self.interfaz.show()
+            from vista import MenuImagenUI
+            self.menu_imagen = MenuImagenUI()
+            self.menu_imagen.btn_jpg_png.clicked.connect(self.abrir_jpg_png)
+            self.menu_imagen.btn_dicom.clicked.connect(self.abrir_visualizador_dicom)
+            self.menu_imagen.btn_convertir_nifti.clicked.connect(self.convertir_dicom_a_nifti)
+            self.menu_imagen.show()
+
         elif rol == "senal":
             self.vista_mat = VisorMatUI()
             self.controlador_mat = VisorMatController(self.vista_mat)
@@ -281,6 +287,30 @@ class LoginController:
         else:
             QMessageBox.warning(None, "Error", "Rol no reconocido.")
 
+    def abrir_jpg_png(self):
+        self.interfaz = InterfazGrafica()
+        self.interfaz.show()
+
+    def abrir_visualizador_dicom(self):
+        carpeta = QFileDialog.getExistingDirectory(None, "Seleccionar carpeta DICOM")
+        if carpeta:
+            self.viewer = DicomViewer(carpeta)
+            self.viewer.show()
+
+    def convertir_dicom_a_nifti(self):
+        carpeta_entrada = QFileDialog.getExistingDirectory(None, "Seleccionar carpeta DICOM")
+        carpeta_salida = QFileDialog.getExistingDirectory(None, "Seleccionar carpeta de salida para NIFTI")
+
+        if carpeta_entrada and carpeta_salida:
+            processor = DicomProcessor(carpeta_entrada)
+            db = MySQLDatabase("127.0.0.1", "informatica2", "info20251", "info2_PF")
+            controller = DicomController(db, processor)
+
+            dicoms = processor.leer_dicoms()
+            controller.procesar_metadatos(dicoms)
+            controller.convertir_y_registrar_nifti(carpeta_salida)
+            QMessageBox.information(None, "Conversión", "Conversión a NIFTI completada.")
+            db.cerrar()
 
 
 if __name__ == "__main__":

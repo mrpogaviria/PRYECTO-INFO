@@ -112,14 +112,7 @@ class MySQLDatabase:
         self.conn.commit()
         print("Tabla nifti creada.")
 
-        try:
-            self.cursor.execute("ALTER TABLE nifti_conversion CHANGE dicom_path dicom_folder VARCHAR(255)")
-            self.conn.commit()
-            print("Columna renombrada a dicom_folder.")
-        except Exception as e:
-            print(f"No se pudo cambiar el nombre de la columna (posiblemente ya existe): {e}")
 
-        print("Tabla nifti creada.")
 
     def insertar_nifti(self, datos):
         sql = '''
@@ -505,6 +498,7 @@ def crear_todas_las_tablas():
             id INT AUTO_INCREMENT PRIMARY KEY,
             patient_id VARCHAR(100),
             nifti_path VARCHAR(255),
+            dicom_folder VARCHAR(255),
             num_dicoms INT,
             birth_date VARCHAR(20),
             sex VARCHAR(10),

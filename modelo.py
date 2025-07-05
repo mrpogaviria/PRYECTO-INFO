@@ -31,6 +31,9 @@ class ModeloSenales:
 
     def guardar_registro(self, nombre_archivo, ruta):
         try:
+            extension = nombre_archivo.split('.')[-1].lower()
+            tipo = 'mat' if extension == 'mat' else 'otro'
+            
             conexion = mysql.connector.connect(
                 host='127.0.0.1',
                 user='informatica2',
@@ -42,12 +45,12 @@ class ModeloSenales:
             INSERT INTO otros_archivos (tipo_archivo, nombre_archivo, ruta_archivo)
             VALUES (%s, %s, %s)
             """
-            cursor.execute(query, ('csv', nombre_archivo, ruta))
+            cursor.execute(query, ('mat', nombre_archivo, ruta))
             conexion.commit()
             cursor.close()
             conexion.close()
         except mysql.connector.Error as e:
-            print("Error al guardar CSV en la base de datos:", e)
+            print("Error al guardar MAT en la base de datos:", e)
 
 class ModeloCSV:
     def __init__(self):
@@ -73,18 +76,18 @@ class ModeloCSV:
             INSERT INTO otros_archivos (tipo_archivo, nombre_archivo, ruta_archivo)
             VALUES (%s, %s, %s)
             """
-            cursor.execute(query, ('mat', nombre_archivo, ruta))
+            cursor.execute(query, ('csv', nombre_archivo, ruta))
             conexion.commit()
             cursor.close()
             conexion.close()
         except mysql.connector.Error as e:
-            print("Error al guardar archivo MAT en la base de datos:", e)
+            print("Error al guardar archivo CSV en la base de datos:", e)
+
     def get_columnas(self):
         return list(self.df.columns)
 
     def get_columna(self, nombre):
         return self.df[nombre]
-
 
 
 class MySQLDatabase:

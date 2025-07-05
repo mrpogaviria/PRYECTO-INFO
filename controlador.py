@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QApplication, QMessageBox, QFileDi
 import numpy as np
 import sys
 import scipy.io
-
+import os
 from modelo import crear_db, crear_todas_las_tablas
 
 class VisorMatController:
@@ -37,6 +37,8 @@ class VisorMatController:
                 return
 
             self.mat_data = mat
+            modelo = ModeloSenales()
+            modelo.guardar_registro(os.path.basename(ruta_archivo), ruta_archivo)
             self.vista.combo_llaves.clear()
             self.vista.combo_llaves.addItems(llaves)
             # Ajustar rango máximo de los SpinBox si los datos son 3D

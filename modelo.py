@@ -1,5 +1,3 @@
-
-from conexion_bd import ConexionBD #cambiar
 from scipy.io import loadmat
 from datetime import datetime
 from skimage.morphology import skeletonize
@@ -32,12 +30,24 @@ class ModeloSenales:
             return None
 
     def guardar_registro(self, nombre_archivo, ruta):
-        conexion = ConexionBD()
-        conexion.conectar()
-        query = "INSERT INTO otros_archivos (tipo_archivo, nombre_archivo, ruta_archivo) VALUES (%s, %s, %s)"
-        conexion.cursor.execute(query, ('mat', nombre_archivo, ruta))
-        conexion.conn.commit()
-        conexion.cerrar()
+        try:
+            conexion = mysql.connector.connect(
+                host='127.0.0.1',
+                user='informatica2',
+                password='info20251',
+                database='info2_PF'
+            )
+            cursor = conexion.cursor()
+            query = """
+            INSERT INTO otros_archivos (tipo_archivo, nombre_archivo, ruta_archivo)
+            VALUES (%s, %s, %s)
+            """
+            cursor.execute(query, ('csv', nombre_archivo, ruta))
+            conexion.commit()
+            cursor.close()
+            conexion.close()
+        except mysql.connector.Error as e:
+            print("Error al guardar CSV en la base de datos:", e)
 
 class ModeloCSV:
     def __init__(self):
@@ -51,12 +61,30 @@ class ModeloCSV:
         return self.df
 
     def guardar_registro(self, nombre_archivo, ruta):
-        conexion = ConexionBD()
-        conexion.conectar()
-        query = "INSERT INTO otros_archivos (tipo_archivo, nombre_archivo, ruta_archivo) VALUES (%s, %s, %s)"
-        conexion.cursor.execute(query, ('csv', nombre_archivo, ruta))
-        conexion.conn.commit()
-        conexion.cerrar()
+        try:
+            conexion = mysql.connector.connect(
+                host='127.0.0.1',
+                user='informatica2',
+                password='info20251',
+                database='info2_PF'
+            )
+            cursor = conexion.cursor()
+            query = """
+            INSERT INTO otros_archivos (tipo_archivo, nombre_archivo, ruta_archivo)
+            VALUES (%s, %s, %s)
+            """
+            cursor.execute(query, ('mat', nombre_archivo, ruta))
+            conexion.commit()
+            cursor.close()
+            conexion.close()
+        except mysql.connector.Error as e:
+            print("Error al guardar archivo MAT en la base de datos:", e)
+    def get_columnas(self):
+        return list(self.df.columns)
+
+    def get_columna(self, nombre):
+        return self.df[nombre]
+
 
 
 class MySQLDatabase:
@@ -112,7 +140,14 @@ class MySQLDatabase:
         self.conn.commit()
         print("Tabla nifti creada.")
 
+        try:
+            self.cursor.execute("ALTER TABLE nifti_conversion CHANGE dicom_path dicom_folder VARCHAR(255)")
+            self.conn.commit()
+            print("Columna renombrada a dicom_folder.")
+        except Exception as e:
+            print(f"No se pudo cambiar el nombre de la columna (posiblemente ya existe): {e}")
 
+        print("Tabla nifti creada.")
 
     def insertar_nifti(self, datos):
         sql = '''
@@ -537,45 +572,46 @@ def insertar_usuarios_por_defecto():
     """
     Inserta un conjunto de usuarios predeterminados si no existen ya.
     """
-conexion = mysql.connector.connect(
-    user="informatica2",
-    password="info20251",
-    host="127.0.0.1",
-    database="info2_PF"
-)
-cursor = conexion.cursor()
-
-sql = "INSERT IGNORE INTO usuarios (username, password, rol) VALUES (%s, %s, %s)"
-usuarios = [
-    ("experto_imagen", "clave123", "imagen"),
-    ("experto_senal", "clave456", "senal")
-]
-
-cursor.executemany(sql, usuarios)
-conexion.commit()
-cursor.close()
-conexion.close()
-
-
-def validar_credenciales(username, password):
-    """
-    Retorna el rol si el usuario existe y la contraseña coincide.
-    Si no existe, retorna None.
-    """
     conexion = mysql.connector.connect(
         user="informatica2",
         password="info20251",
         host="127.0.0.1",
         database="info2_PF"
     )
-    cursor = conexion.cursor(dictionary=True)
-    query = "SELECT rol FROM usuarios WHERE username = %s AND password = %s"
-    cursor.execute(query, (username, password))
-    resultado = cursor.fetchone()
+    cursor = conexion.cursor()
+
+    sql = "INSERT IGNORE INTO usuarios (username, password, rol) VALUES (%s, %s, %s)"
+    usuarios = [
+        ("experto_imagen", "clave123", "imagen"),
+        ("experto_senal", "clave456", "senal")
+    ]
+
+    cursor.executemany(sql, usuarios)
+    conexion.commit()
     cursor.close()
     conexion.close()
 
-    if resultado:
-        return resultado["rol"]
-    else:
+
+def validar_credenciales(username, password):
+    try:
+        conexion = mysql.connector.connect(
+            user="informatica2",
+            password="info20251",
+            host="127.0.0.1",
+            database="info2_PF"
+        )
+        cursor = conexion.cursor(dictionary=True)
+        query = "SELECT rol FROM usuarios WHERE username = %s AND password = %s"
+        cursor.execute(query, (username, password))
+        resultado = cursor.fetchone()
+        cursor.fetchall()  # limpia cualquier resultado restante
+        cursor.close()
+        conexion.close()
+
+        if resultado:
+            return resultado["rol"]
+        else:
+            return None
+    except mysql.connector.Error as e:
+        print("ERROR en validar_credenciales:", e)
         return None

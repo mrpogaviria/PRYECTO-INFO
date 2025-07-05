@@ -1,11 +1,11 @@
-
 from modelo import ModeloSenales, ModeloCSV, MySQLDatabase, DicomProcessor, ImageProcessor, BinarizacionImagen, MorfologiaImagen, insertar_imagen, obtener_imagenes_procesadas, insertar_usuarios_por_defecto, validar_credenciales
-from vista import VisorMatUI, VisorCSVUI, DicomViewer, LoginUI, InterfazGrafica, VisorMatUI, LoginUI
+from vista import VisorMatUI, VisorCSVUI, DicomViewer, LoginUI, InterfazGrafica, VisorMatUI, LoginUI, MenuSenalUI
 from PyQt5.QtWidgets import QTableWidgetItem, QApplication, QMessageBox, QFileDialog
 import numpy as np
 import sys
 import scipy.io
 
+from modelo import crear_db, crear_todas_las_tablas
 
 class VisorMatController:
     def __init__(self, vista):
@@ -16,17 +16,17 @@ class VisorMatController:
         self.vista.btn_graficar.clicked.connect(self.graficar_senal_completa)
         self.vista.btn_graficar_intervalo.clicked.connect(self.graficar_intervalo)
         self.vista.btn_promedio.clicked.connect(self.calcular_promedio)
+        self.vista.btn_cargar_archivo.clicked.connect(self.cargar_archivo)
+
 
         # Abrir el archivo MAT al inicio
-        self.cargar_archivo()
 
     def cargar_archivo(self):
         ruta_archivo, _ = QFileDialog.getOpenFileName(
             self.vista, "Seleccionar archivo .mat", "", "Archivos MAT (*.mat)"
         )
         if not ruta_archivo:
-            self.vista.mostrar_error("No se seleccionó ningún archivo.")
-            return
+            return  # No mostrar error, solo salir
 
         try:
             mat = scipy.io.loadmat(ruta_archivo)
@@ -39,9 +39,16 @@ class VisorMatController:
             self.mat_data = mat
             self.vista.combo_llaves.clear()
             self.vista.combo_llaves.addItems(llaves)
+            # Ajustar rango máximo de los SpinBox si los datos son 3D
+            datos = self.mat_data[llaves[0]]
+            if datos.ndim == 3:
+                self.vista.spin_canal.setMaximum(datos.shape[0] - 1)
+                self.vista.spin_ensayo.setMaximum(datos.shape[2] - 1)
+
 
         except Exception as e:
             self.vista.mostrar_error(f"Error al cargar el archivo: {str(e)}")
+
 
     def graficar_senal_completa(self):
         if self.mat_data is None:
@@ -49,15 +56,31 @@ class VisorMatController:
             return
 
         llave = self.vista.combo_llaves.currentText()
-        datos = np.squeeze(self.mat_data[llave])
 
-        self.vista.figura.clear()
-        ax = self.vista.figura.add_subplot(111)
-        ax.plot(datos)
-        ax.set_title(f"Señal completa: {llave}")
-        ax.set_xlabel("Índice")
-        ax.set_ylabel("Valor")
-        self.vista.canvas.draw()
+        try:
+            datos = self.mat_data[llave]
+            canal = self.vista.spin_canal.value()
+            ensayo = self.vista.spin_ensayo.value()
+
+            if datos.ndim == 3:
+                datos = datos[canal, :, ensayo]
+
+            if datos.ndim != 1:
+                self.vista.mostrar_error("No es una señal unidimensional.")
+                return
+
+            self.vista.figura.clear()
+            ax = self.vista.figura.add_subplot(111)
+            ax.plot(datos)
+            ax.set_title(f"Señal completa: {llave} [canal {canal}, ensayo {ensayo}]")
+            ax.set_xlabel("Índice")
+            ax.set_ylabel("Valor")
+            self.vista.canvas.draw()
+
+        except Exception as e:
+            self.vista.mostrar_error(f"Error: {str(e)}")
+
+
 
     def graficar_intervalo(self):
         if self.mat_data is None:
@@ -77,6 +100,10 @@ class VisorMatController:
 
         llave = self.vista.combo_llaves.currentText()
         datos = np.squeeze(self.mat_data[llave])
+        canal = self.vista.spin_canal.value()
+        ensayo = self.vista.spin_ensayo.value()
+        datos = datos[canal, :, ensayo]
+
 
         if inicio < 0 or fin > len(datos) or inicio >= fin:
             self.vista.mostrar_error("Rango fuera de los límites de la señal.")
@@ -96,19 +123,48 @@ class VisorMatController:
             return
 
         llave = self.vista.combo_llaves.currentText()
-        datos = np.squeeze(self.mat_data[llave])
-        promedio = np.mean(datos)
+        try:
+            datos = self.mat_data[llave]
+            if datos.ndim != 3:
+                self.vista.mostrar_error("Este archivo no tiene formato tridimensional para promedio por canal.")
+                return
 
-        self.vista.mostrar_error(f"El promedio de la señal '{llave}' es: {promedio:.3f}")
+            promedio = np.mean(datos, axis=1)  # (canales, ensayos)
+
+            self.vista.figura.clear()
+            ax = self.vista.figura.add_subplot(111)
+            for i in range(min(5, promedio.shape[1])):  # máximo 5 ensayos para no saturar
+                ax.stem(range(promedio.shape[0]), promedio[:, i], label=f"Ensayo {i}")
+            ax.set_title("Promedio por canal (eje 1)")
+            ax.set_xlabel("Canal")
+            ax.set_ylabel("Promedio")
+            ax.legend()
+            self.vista.canvas.draw()
+
+        except Exception as e:
+            self.vista.mostrar_error(f"Error: {str(e)}")
+
 
 
 class ControladorCSV:
     def __init__(self):
-        self.vista = VisorCSVUI()
-        self.modelo = ModeloCSV()
+        try:
+            self.vista = VisorCSVUI()
+            self.modelo = ModeloCSV()
 
-        self.vista.btn_graficar.clicked.connect(self.graficar_dispersión)
+            self.vista.btn_cargar_csv.clicked.connect(self.cargar_csv_desde_vista)
+            self.vista.btn_graficar.clicked.connect(self.graficar_dispersion)
 
+            self.vista.show()
+        except Exception as e:
+            print("ERROR en ControladorCSV:", repr(e))
+
+    def cargar_csv_desde_vista(self):
+        ruta, _ = QFileDialog.getOpenFileName(self.vista, "Seleccionar archivo CSV", "", "Archivos CSV (*.csv)")
+        if ruta:
+            self.cargar_archivo(ruta)
+
+    
     def cargar_archivo(self, ruta):
         self.modelo.cargar_csv(ruta)
         columnas = self.modelo.get_columnas()
@@ -129,7 +185,7 @@ class ControladorCSV:
             for j in range(len(df.columns)):
                 self.vista.tabla.setItem(i, j, QTableWidgetItem(str(df.iat[i, j])))
 
-    def graficar_dispersión(self):
+    def graficar_dispersion(self):
         x_col = self.vista.combo_x.currentText()
         y_col = self.vista.combo_y.currentText()
         x = self.modelo.get_columna(x_col)
@@ -281,11 +337,20 @@ class LoginController:
             self.menu_imagen.show()
 
         elif rol == "senal":
-            self.vista_mat = VisorMatUI()
-            self.controlador_mat = VisorMatController(self.vista_mat)
-            self.vista_mat.show()
+            self.menu_senal = MenuSenalUI()
+            self.menu_senal.btn_mat.clicked.connect(self.abrir_mat)
+            self.menu_senal.btn_csv.clicked.connect(self.abrir_csv)
+            self.menu_senal.show()
+
         else:
             QMessageBox.warning(None, "Error", "Rol no reconocido.")
+    def abrir_mat(self):
+        self.vista_mat = VisorMatUI()
+        self.controlador_mat = VisorMatController(self.vista_mat)
+        self.vista_mat.show()
+
+    def abrir_csv(self):
+        self.controlador_csv = ControladorCSV()
 
     def abrir_jpg_png(self):
         self.interfaz = InterfazGrafica()
@@ -314,6 +379,10 @@ class LoginController:
 
 
 if __name__ == "__main__":
+    crear_db()
+    crear_todas_las_tablas()
+    insertar_usuarios_por_defecto()
+
     app = QApplication(sys.argv)
     login_controller = LoginController()
     sys.exit(app.exec_())

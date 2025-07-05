@@ -1,4 +1,3 @@
-
 from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QLabel, QVBoxLayout, QLineEdit, QMessageBox, QTableWidget, QMainWindow, QSlider, QHBoxLayout, QApplication, QFileDialog, QHBoxLayout, QSpinBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -10,6 +9,7 @@ import numpy as np
 import pydicom
 import sys
 import cv2
+import pandas as pd
 
 
 class VisorMatUI(QWidget):
@@ -23,11 +23,23 @@ class VisorMatUI(QWidget):
         self.campo_intervalo.setPlaceholderText("Ej: 0-100")
         self.btn_graficar_intervalo = QPushButton("Graficar Intervalo")
         self.btn_promedio = QPushButton("Calcular Promedio")
+        self.spin_canal = QSpinBox()
+        self.spin_canal.setRange(0, 100)
+
+        self.spin_ensayo = QSpinBox()
+        self.spin_ensayo.setRange(0, 100)
+
         self.figura = Figure()
         self.canvas = FigureCanvas(self.figura)
+        self.btn_cargar_archivo = QPushButton("Cargar Archivo .MAT")
         layout = QVBoxLayout()
+        layout.addWidget(self.btn_cargar_archivo)
         layout.addWidget(QLabel("Seleccione una llave:"))
         layout.addWidget(self.combo_llaves)
+        layout.addWidget(QLabel("Canal:"))
+        layout.addWidget(self.spin_canal)
+        layout.addWidget(QLabel("Ensayo:"))
+        layout.addWidget(self.spin_ensayo)
         layout.addWidget(self.btn_graficar)
         layout.addWidget(self.campo_intervalo)
         layout.addWidget(self.btn_graficar_intervalo)
@@ -47,14 +59,18 @@ class VisorCSVUI(QWidget):
         super().__init__()
         self.setWindowTitle("Visualizador de CSV")
         self.resize(900, 600)
+
         self.tabla = QTableWidget()
         self.combo_x = QComboBox()
         self.combo_y = QComboBox()
         self.btn_graficar = QPushButton("Graficar Scatter")
         self.figura = Figure()
         self.canvas = FigureCanvas(self.figura)
+        self.btn_cargar_csv = QPushButton("Cargar Archivo CSV")
+
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Datos CSV:"))
+        layout.addWidget(self.btn_cargar_csv)
         layout.addWidget(self.tabla)
         layout.addWidget(QLabel("Eje X:"))
         layout.addWidget(self.combo_x)
@@ -63,6 +79,13 @@ class VisorCSVUI(QWidget):
         layout.addWidget(self.btn_graficar)
         layout.addWidget(self.canvas)
         self.setLayout(layout)
+
+    def mostrar_error(self, mensaje):
+        msg = QMessageBox()
+        msg.setWindowTitle("Error")
+        msg.setText(mensaje)
+        msg.exec_()
+
 
     def mostrar_error(self, mensaje):
         msg = QMessageBox()
@@ -345,6 +368,21 @@ class MenuImagenUI(QWidget):
         layout.addWidget(self.btn_jpg_png)
         layout.addWidget(self.btn_dicom)
         layout.addWidget(self.btn_convertir_nifti)
+        self.setLayout(layout)
+
+class MenuSenalUI(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Menu - Experto en Senales")
+        self.setGeometry(100, 100, 300, 200)
+
+        self.btn_mat = QPushButton("Procesar Senales .MAT")
+        self.btn_csv = QPushButton("Procesar Datos .CSV")
+
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Seleccione el tipo de datos a procesar:"))
+        layout.addWidget(self.btn_mat)
+        layout.addWidget(self.btn_csv)
         self.setLayout(layout)
 
 

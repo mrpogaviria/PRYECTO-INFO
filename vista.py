@@ -1,3 +1,4 @@
+from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QLabel, QVBoxLayout, QLineEdit, QMessageBox, QTableWidget, QMainWindow, QSlider, QHBoxLayout, QApplication, QFileDialog, QHBoxLayout, QSpinBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -15,38 +16,17 @@ import pandas as pd
 class VisorMatUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Visualizador de Señales")
-        self.resize(800, 600)
-        self.combo_llaves = QComboBox()
-        self.btn_graficar = QPushButton("Graficar Señal Completa")
-        self.campo_intervalo = QLineEdit()
-        self.campo_intervalo.setPlaceholderText("Ej: 0-100")
-        self.btn_graficar_intervalo = QPushButton("Graficar Intervalo")
-        self.btn_promedio = QPushButton("Calcular Promedio")
-        self.spin_canal = QSpinBox()
-        self.spin_canal.setRange(0, 100)
+        uic.loadUi("visor_mat.ui", self)
 
-        self.spin_ensayo = QSpinBox()
-        self.spin_ensayo.setRange(0, 100)
-
+        #Figura de matplot
         self.figura = Figure()
         self.canvas = FigureCanvas(self.figura)
-        self.btn_cargar_archivo = QPushButton("Cargar Archivo .MAT")
-        layout = QVBoxLayout()
-        layout.addWidget(self.btn_cargar_archivo)
-        layout.addWidget(QLabel("Seleccione una llave:"))
-        layout.addWidget(self.combo_llaves)
-        layout.addWidget(QLabel("Canal:"))
-        layout.addWidget(self.spin_canal)
-        layout.addWidget(QLabel("Ensayo:"))
-        layout.addWidget(self.spin_ensayo)
-        layout.addWidget(self.btn_graficar)
-        layout.addWidget(self.campo_intervalo)
-        layout.addWidget(self.btn_graficar_intervalo)
-        layout.addWidget(self.btn_promedio)
-        layout.addWidget(self.canvas)
-        self.setLayout(layout)     
 
+        #Añadir el canvas al widget
+        layout = QVBoxLayout()
+        layout.addWidget(self.canvas)
+        self.canvas_widget.setLayout(layout)
+                   
 
     def mostrar_error(self, mensaje):
         msg = QMessageBox()

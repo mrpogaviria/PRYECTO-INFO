@@ -19,8 +19,7 @@ class VisorMatController:
         self.vista.btn_cargar_archivo.clicked.connect(self.cargar_archivo)
 
 
-        # Abrir el archivo MAT al inicio
-
+    #Abrir el archivo MAT al inicio
     def cargar_archivo(self):
         ruta_archivo, _ = QFileDialog.getOpenFileName(
             self.vista, "Seleccionar archivo .mat", "", "Archivos MAT (*.mat)"

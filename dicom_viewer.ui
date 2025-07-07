@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1202</width>
+    <height>608</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Visualizador de archivos DICOM</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>371</width>
+      <height>521</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QWidget" name="axial_container" native="true">
+       <widget class="QWidget" name="verticalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>371</width>
+          <height>411</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QWidget" name="axial_canvas_widget" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QSlider" name="axial_slider">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>470</y>
+          <width>291</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="axial_label">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>430</y>
+          <width>81</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Axial Slice: 0</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>20</y>
+      <width>371</width>
+      <height>521</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QWidget" name="coronal_container" native="true">
+       <widget class="QWidget" name="verticalLayoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>371</width>
+          <height>411</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QWidget" name="coronal_canvas_widget" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QSlider" name="coronal_slider">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>470</y>
+          <width>291</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="coronal_label">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>430</y>
+          <width>111</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Coronal Slice: 0</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>800</x>
+      <y>20</y>
+      <width>371</width>
+      <height>521</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QWidget" name="sagittal_container" native="true">
+       <widget class="QWidget" name="verticalLayoutWidget_4">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>371</width>
+          <height>411</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QWidget" name="sagittal_canvas_widget" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QSlider" name="sagittal_slider">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>470</y>
+          <width>301</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="sagittal_label">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>430</y>
+          <width>131</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Sagittal Slice: 0</string>
+        </property>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1202</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

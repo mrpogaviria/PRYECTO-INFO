@@ -67,61 +67,43 @@ class VisorCSVUI(QWidget):
         msg.exec_()
 
 
-    def mostrar_error(self, mensaje):
-        msg = QMessageBox()
-        msg.setWindowTitle("Error")
-        msg.setText(mensaje)
-        msg.exec_()
-
+    # def mostrar_error(self, mensaje):
+    #     msg = QMessageBox()
+    #     msg.setWindowTitle("Error")
+    #     msg.setText(mensaje)
+    #     msg.exec_()
 
 class DicomViewer(QMainWindow):
     def __init__(self, carpeta_dicom):
         super().__init__()
-        self.setWindowTitle("Visualización DICOM")
-        self.setGeometry(100, 100, 1200, 600)
+        uic.loadUi("dicom_viewer.ui", self)
+        
 
         self.volumen = self.cargar_volumen(carpeta_dicom)
-
         self.num_axial = self.volumen.shape[0]
         self.num_coronal = self.volumen.shape[1]
         self.num_sagittal = self.volumen.shape[2]
-
-        main_widget = QWidget()
-        self.setCentralWidget(main_widget)
-        layout = QHBoxLayout()
-        main_widget.setLayout(layout)
 
         self.figures = []
         self.canvases = []
         self.sliders = []
         self.labels = []
 
-        planos = ["Axial", "Coronal", "Sagittal"]
+        planos = [("Axial", self.axial_canvas_widget, self.axial_label, self.axial_slider, self.num_axial),
+            ("Coronal", self.coronal_canvas_widget, self.coronal_label, self.coronal_slider, self.num_coronal),
+            ("Sagittal", self.sagittal_canvas_widget, self.sagittal_label, self.sagittal_slider, self.num_sagittal),
+        ]
 
-        for i, plano in enumerate(planos):
-            vbox = QVBoxLayout()
+        for i, (plano, canvas_widget, label, slider, max_index) in enumerate(planos):
             fig = Figure(figsize=(4,4))
             canvas = FigureCanvas(fig)
-            ax = fig.add_subplot(111)
-            ax.axis('off')
-
-            slider = QSlider(Qt.Horizontal)
-            max_index = [
-                self.num_axial - 1,
-                self.num_coronal - 1,
-                self.num_sagittal - 1
-            ][i]
-            slider.setMaximum(max_index)
+            layout = QVBoxLayout()
+            layout.addWidget(canvas)
+            canvas_widget.setLayout(layout)
+            
+            slider.setMaximum(max_index - 1)
             slider.setValue(0)
-
-            label = QLabel(f"{plano} Slice: 0")
             slider.valueChanged.connect(lambda value, p=plano: self.actualizar_imagen(p, value))
-
-            vbox.addWidget(canvas)
-            vbox.addWidget(label)
-            vbox.addWidget(slider)
-
-            layout.addLayout(vbox)
 
             self.figures.append(fig)
             self.canvases.append(canvas)
@@ -336,19 +318,8 @@ class LoginUI(QWidget):
 class MenuImagenUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Menú - Experto en Imágenes")
-        self.setGeometry(100, 100, 400, 300)
+        uic.loadUi("menu_imagen.ui", self)
 
-        self.btn_jpg_png = QPushButton("Procesar JPG/PNG")
-        self.btn_dicom = QPushButton("Visualizar DICOM")
-        self.btn_convertir_nifti = QPushButton("Convertir DICOM a NIFTI")
-
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Seleccione una acción:"))
-        layout.addWidget(self.btn_jpg_png)
-        layout.addWidget(self.btn_dicom)
-        layout.addWidget(self.btn_convertir_nifti)
-        self.setLayout(layout)
 
 class MenuSenalUI(QWidget):
     def __init__(self):

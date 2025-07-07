@@ -1,11 +1,10 @@
-from modelo import ModeloSenales, ModeloCSV, MySQLDatabase, DicomProcessor, ImageProcessor, BinarizacionImagen, MorfologiaImagen, insertar_imagen, obtener_imagenes_procesadas, insertar_usuarios_por_defecto, validar_credenciales
-from vista import VisorMatUI, VisorCSVUI, DicomViewer, LoginUI, InterfazGrafica, VisorMatUI, LoginUI, MenuSenalUI
+from modelo import ModeloSenales, ModeloCSV, MySQLDatabase, DicomProcessor, ImageProcessor, BinarizacionImagen, MorfologiaImagen, insertar_imagen, obtener_imagenes_procesadas, insertar_usuarios_por_defecto, validar_credenciales, crear_db, crear_todas_las_tablas
+from vista import VisorMatUI, VisorCSVUI, DicomViewer, LoginUI, InterfazGrafica, VisorMatUI, LoginUI, MenuSenalUI, MenuImagenUI
 from PyQt5.QtWidgets import QTableWidgetItem, QApplication, QMessageBox, QFileDialog
 import numpy as np
 import sys
 import scipy.io
 import os
-from modelo import crear_db, crear_todas_las_tablas
 
 class VisorMatController:
     def __init__(self, vista):
@@ -330,7 +329,6 @@ class LoginController:
 
     def abrir_interfaz_por_rol(self, rol):
         if rol == "imagen":
-            from vista import MenuImagenUI
             self.menu_imagen = MenuImagenUI()
             self.menu_imagen.btn_jpg_png.clicked.connect(self.abrir_jpg_png)
             self.menu_imagen.btn_dicom.clicked.connect(self.abrir_visualizador_dicom)
@@ -345,6 +343,7 @@ class LoginController:
 
         else:
             QMessageBox.warning(None, "Error", "Rol no reconocido.")
+    
     def abrir_mat(self):
         self.vista_mat = VisorMatUI()
         self.controlador_mat = VisorMatController(self.vista_mat)

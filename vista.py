@@ -91,7 +91,7 @@ class DicomViewer(QMainWindow):
         self.actualizar_todas()
 
     def cargar_volumen(self, carpeta):
-        archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta)]
+        archivos = [os.path.join(carpeta, f) for f in os.listdir(carpeta) if os.path.isfile(os.path.join(carpeta, f)) and f.lower().endswith(".dcm")]
         slices = [pydicom.dcmread(f) for f in archivos]
         slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
         volumen = np.stack([s.pixel_array for s in slices])
@@ -122,9 +122,12 @@ class DicomViewer(QMainWindow):
 
 
 class InterfazGrafica(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         uic.loadUi(os.path.join(UI_PATH, "interfaz_imagenes.ui"), self)
+        self.image_label.setMinimumSize(300, 300)
+        self.image_label.setAlignment(Qt.AlignCenter)
+        self.image_label.setScaledContents(False)
 
         self.setWindowTitle("Procesamiento de Imágenes Biomédicas")
 
@@ -158,8 +161,15 @@ class InterfazGrafica(QWidget):
         bytes_img = canal * ancho
         qimg = QImage(img_rgb.data, ancho, altura, bytes_img, QImage.Format_BGR888)
         pixmap = QPixmap.fromImage(qimg)
-        self.image_label.setPixmap(pixmap.scaled(
-            self.image_label.width(), self.image_label.height(), Qt.KeepAspectRatio))
+        self._pixmap_original = pixmap
+        pixmap_escalado = pixmap.scaled(
+            self.image_label.width(),
+            self.image_label.height(),
+            Qt.KeepAspectRatio,
+            Qt.SmoothTransformation
+        )
+        self.image_label.setPixmap(pixmap_escalado)
+        
 
     def cargar_imagen(self):
         ruta, _ = QFileDialog.getOpenFileName(self, "Abrir Imagen", "", "Imagenes (*.png *.jpg *.jpeg)")

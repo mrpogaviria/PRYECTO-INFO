@@ -28,15 +28,13 @@ class VisorMatController:
 
         try:
             mat = scipy.io.loadmat(ruta_archivo)
-            llaves = [k for k in mat.keys() if not k.startswith("__")]
+            llaves = list(mat.keys())
 
             if not llaves:
                 self.vista.mostrar_error("El archivo no contiene variables válidas.")
                 return
 
             self.mat_data = mat
-            modelo = ModeloSenales()
-            modelo.guardar_registro(os.path.basename(ruta_archivo), ruta_archivo)
             self.vista.combo_llaves.clear()
             self.vista.combo_llaves.addItems(llaves)
             # Ajustar rango máximo de los SpinBox si los datos son 3D
@@ -56,16 +54,23 @@ class VisorMatController:
             return
 
         llave = self.vista.combo_llaves.currentText()
+        datos = self.mat_data.get(llave)
+
+        if not isinstance(datos, np.ndarray):
+            self.vista.mostrar_error("No es un arreglo, vuelva a intentarlo.")
+            return
+
+        canal = self.vista.spin_canal.value()
+        ensayo = self.vista.spin_ensayo.value()
 
         try:
-            datos = self.mat_data[llave]
-            canal = self.vista.spin_canal.value()
-            ensayo = self.vista.spin_ensayo.value()
-
             if datos.ndim == 3:
                 datos = datos[canal, :, ensayo]
-
-            if datos.ndim != 1:
+            elif datos.ndim == 2:
+                datos = datos[canal, :]
+            elif datos.ndim == 1:
+                pass
+            else:
                 self.vista.mostrar_error("No es una señal unidimensional.")
                 return
 
@@ -75,10 +80,11 @@ class VisorMatController:
             ax.set_title(f"Señal completa: {llave} [canal {canal}, ensayo {ensayo}]")
             ax.set_xlabel("Índice")
             ax.set_ylabel("Valor")
+            ax.legend([llave])
             self.vista.canvas.draw()
 
         except Exception as e:
-            self.vista.mostrar_error(f"Error: {str(e)}")
+            self.vista.mostrar_error(f"Error al graficar: {str(e)}")
 
 
 
@@ -330,7 +336,6 @@ class LoginController:
     def abrir_interfaz_por_rol(self, rol):
         if rol == "imagen":
             self.menu_imagen = MenuImagenUI()
-            self.menu_imagen.btn_jpg_png.clicked.connect(self.abrir_jpg_png)
             self.menu_imagen.btn_dicom.clicked.connect(self.abrir_visualizador_dicom)
             self.menu_imagen.btn_convertir_nifti.clicked.connect(self.convertir_dicom_a_nifti)
             self.menu_imagen.show()
@@ -374,15 +379,38 @@ class LoginController:
             dicoms = processor.leer_dicoms()
             controller.procesar_metadatos(dicoms)
             controller.convertir_y_registrar_nifti(carpeta_salida)
-            QMessageBox.information(None, "Conversión", "Conversión a NIFTI completada.")
-            db.cerrar()
+            msg = QMessageBox()
+            msg.setWindowTitle("Conversión")
+            msg.setText("Conversión a NIFTI completada.")
+            msg.setIcon(QMessageBox.Information)
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.setStyleSheet("""
+                QMessageBox {
+                    background-color: #F4DFF4; 
+                    color: #6A1B94;
+                    font-family: 'Segoe UI';
+                    font-size: 9pt;
+                }
+                QPushButton {
+                    background-color: #DAB3E3;
+                    color: black;
+                    border-radius: 4px;
+                    padding: 8px 20px;
+                }
+                QPushButton:hover {
+                    background-color: #BA68C8;
+                }
+            """)
+
+            msg.exec_()
+
+        
 
 
 if __name__ == "__main__":
     crear_db()
     crear_todas_las_tablas()
     insertar_usuarios_por_defecto()
-
     app = QApplication(sys.argv)
     login_controller = LoginController()
     sys.exit(app.exec_())

@@ -1,10 +1,9 @@
-from modelo import ModeloSenales, ModeloCSV, MySQLDatabase, DicomProcessor, ImageProcessor, BinarizacionImagen, MorfologiaImagen, insertar_imagen, obtener_imagenes_procesadas, insertar_usuarios_por_defecto, validar_credenciales, crear_db, crear_todas_las_tablas
+from modelo import ModeloCSV, MySQLDatabase, DicomProcessor, ImageProcessor, BinarizacionImagen, MorfologiaImagen, insertar_imagen, obtener_imagenes_procesadas, insertar_usuarios_por_defecto, validar_credenciales, crear_db, crear_todas_las_tablas
 from vista import VisorMatUI, VisorCSVUI, DicomViewer, LoginUI, InterfazGrafica, VisorMatUI, LoginUI, MenuSenalUI, MenuImagenUI
 from PyQt5.QtWidgets import QTableWidgetItem, QApplication, QMessageBox, QFileDialog
 import numpy as np
 import sys
 import scipy.io
-import os
 
 class VisorMatController:
     def __init__(self, vista):

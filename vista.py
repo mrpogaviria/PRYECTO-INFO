@@ -1,18 +1,14 @@
-from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QLabel, QVBoxLayout, QLineEdit, QMessageBox, QTableWidget, QMainWindow, QSlider, QHBoxLayout, QApplication, QFileDialog, QHBoxLayout, QSpinBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMessageBox, QMainWindow, QApplication, QFileDialog
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QImage
+from PyQt5 import uic
 from modelo import ImageProcessor, MorfologiaImagen, BinarizacionImagen, crear_db, crear_tabla_imagenes, insertar_imagen, obtener_imagenes_procesadas
-import os
 import numpy as np
 import pydicom
 import sys
 import cv2
-import pandas as pd
-
-from PyQt5.QtWidgets import QWidget, QMainWindow
-from PyQt5 import uic
 import os
 
 UI_PATH = os.path.dirname(__file__)

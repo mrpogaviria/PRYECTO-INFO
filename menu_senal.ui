@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MenuImagenUI</class>
- <widget class="QWidget" name="MenuImagenUI">
+ <class>MenuSenalUI</class>
+ <widget class="QWidget" name="MenuSenalUI">
   <property name="geometry">
    <rect><x>0</x><y>0</y><width>800</width><height>600</height></rect>
   </property>
@@ -26,9 +26,8 @@ QLabel {
 </string></property>
   <layout class="QVBoxLayout" name="verticalLayout">
 
-   <item><widget class="QPushButton" name="btn_jpg_png"><property name="text"><string>Procesar JPG/PNG</string></property></widget></item>
-   <item><widget class="QPushButton" name="btn_dicom"><property name="text"><string>Visualizar DICOM</string></property></widget></item>
-   <item><widget class="QPushButton" name="btn_convertir_nifti"><property name="text"><string>Convertir DICOM a NIFTI</string></property></widget></item>
+   <item><widget class="QPushButton" name="btn_mat"><property name="text"><string>Procesar Señales .MAT</string></property></widget></item>
+   <item><widget class="QPushButton" name="btn_csv"><property name="text"><string>Procesar Datos .CSV</string></property></widget></item>
     
   </layout>
  </widget>

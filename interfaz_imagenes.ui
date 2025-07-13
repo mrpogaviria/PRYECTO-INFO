@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>InterfazGrafica</class>
+ <widget class="QWidget" name="InterfazGrafica">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>800</width><height>600</height></rect>
+  </property>
+  <property name="styleSheet"><string>
+QWidget {
+    font-family: 'Sans Serif';
+    font-size: 12pt;
+    background-color: #f5f0ff;
+}
+QPushButton {
+    background-color: #b19cd9;
+    color: white;
+    border-radius: 6px;
+    padding: 6px;
+}
+QPushButton:hover {
+    background-color: #a186d3;
+}
+QLabel {
+    font-weight: bold;
+}
+</string></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+
+   <item><widget class="QLabel" name="image_label"><property name="text"><string>Imagen</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_cargar"><property name="text"><string>Cargar Imagen</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_histograma"><property name="text"><string>Histograma RGB</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_ecualizar"><property name="text"><string>Ecualizar Histograma</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_conteo"><property name="text"><string>Conteo de Células</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_binarizar"><property name="text"><string>Binarizar Imagen</string></property></widget></item>
+   <item><widget class="QComboBox" name="combo_binarizacion"/></item>
+   <item><widget class="QSpinBox" name="spin_umbral"/></item>
+   <item><widget class="QPushButton" name="boton_morfologia"><property name="text"><string>Operación Morfológica</string></property></widget></item>
+   <item><widget class="QComboBox" name="combo_morfologia"/></item>
+   <item><widget class="QSpinBox" name="spin_kernel"/></item>
+   <item><widget class="QPushButton" name="boton_esqueleto"><property name="text"><string>Esqueletizar Imagen</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_bordes"><property name="text"><string>Detección de Bordes (Canny)</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_historial"><property name="text"><string>Ver Historial</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_convertir_color"><property name="text"><string>Convertir Espacio de Color</string></property></widget></item>
+
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,4 +1,3 @@
-from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QLabel, QVBoxLayout, QLineEdit, QMessageBox, QTableWidget, QMainWindow, QSlider, QHBoxLayout, QApplication, QFileDialog, QHBoxLayout, QSpinBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -12,21 +11,24 @@ import sys
 import cv2
 import pandas as pd
 
+from PyQt5.QtWidgets import QWidget, QMainWindow
+from PyQt5 import uic
+import os
+
+UI_PATH = os.path.dirname(__file__)
 
 class VisorMatUI(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi("visor_mat.ui", self)
+        uic.loadUi(os.path.join(UI_PATH, "visor_mat.ui"), self)
 
-        #Figura de matplot
+    
         self.figura = Figure()
         self.canvas = FigureCanvas(self.figura)
 
-        #Añadir el canvas al widget
-        layout = QVBoxLayout()
-        layout.addWidget(self.canvas)
-        self.canvas_widget.setLayout(layout)
-                   
+    
+        self.layout().addWidget(self.canvas) 
+
 
     def mostrar_error(self, mensaje):
         msg = QMessageBox()
@@ -37,41 +39,17 @@ class VisorMatUI(QWidget):
 class VisorCSVUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Visualizador de CSV")
-        self.resize(900, 600)
+        uic.loadUi(os.path.join(UI_PATH, "visor_csv.ui"), self)
 
-        self.tabla = QTableWidget()
-        self.combo_x = QComboBox()
-        self.combo_y = QComboBox()
-        self.btn_graficar = QPushButton("Graficar Scatter")
         self.figura = Figure()
         self.canvas = FigureCanvas(self.figura)
-        self.btn_cargar_csv = QPushButton("Cargar Archivo CSV")
-
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Datos CSV:"))
-        layout.addWidget(self.btn_cargar_csv)
-        layout.addWidget(self.tabla)
-        layout.addWidget(QLabel("Eje X:"))
-        layout.addWidget(self.combo_x)
-        layout.addWidget(QLabel("Eje Y:"))
-        layout.addWidget(self.combo_y)
-        layout.addWidget(self.btn_graficar)
-        layout.addWidget(self.canvas)
-        self.setLayout(layout)
+        self.layout().addWidget(self.canvas)
 
     def mostrar_error(self, mensaje):
         msg = QMessageBox()
         msg.setWindowTitle("Error")
         msg.setText(mensaje)
         msg.exec_()
-
-
-    # def mostrar_error(self, mensaje):
-    #     msg = QMessageBox()
-    #     msg.setWindowTitle("Error")
-    #     msg.setText(mensaje)
-    #     msg.exec_()
 
 class DicomViewer(QMainWindow):
     def __init__(self, carpeta_dicom):
@@ -146,81 +124,33 @@ class DicomViewer(QMainWindow):
 class InterfazGrafica(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Procesamiento de Imágenes Biomédicas")
-        self.setGeometry(100, 100, 1000, 600)
+        uic.loadUi(os.path.join(UI_PATH, "interfaz_imagenes.ui"), self)
 
-        self.image_label = QLabel("Cargue una imagen")
-        self.image_label.setAlignment(Qt.AlignCenter)
+        self.setWindowTitle("Procesamiento de Imágenes Biomédicas")
+
         self.imagen_actual = None
         self.procesador = None
 
-        self.boton_cargar = QPushButton("Cargar Imagen")
-        self.boton_histograma = QPushButton("Histograma RGB")
-        self.boton_ecualizar = QPushButton("Ecualizar Histograma")
-        self.boton_conteo = QPushButton("Conteo de Células")
-        self.boton_binarizar = QPushButton("Binarizar Imagen")
-        self.boton_morfologia = QPushButton("Operación Morfológica")
-        self.boton_esqueleto = QPushButton("Esqueletizar Imagen")
-        self.boton_bordes = QPushButton("Detección de Bordes (Canny)")
-        self.boton_historial = QPushButton("Ver Historial")
-
-        # Combo boxes
-        self.combo_binarizacion = QComboBox()
-        self.combo_binarizacion.addItems(["binario", "binario_inv", "truncado", "tozero", "tozero_inv"])
-
-        self.combo_morfologia = QComboBox()
-        self.combo_morfologia.addItems(["erosion", "dilatacion", "apertura", "cierre", "gradiente", "tophat", "blackhat"])
-
-        self.spin_kernel = QSpinBox()
-        self.spin_kernel.setValue(5)
-        self.spin_kernel.setMinimum(1)
-        self.spin_kernel.setMaximum(21)
-
-        self.spin_umbral = QSpinBox()
-        self.spin_umbral.setValue(125)
-        self.spin_umbral.setRange(0, 255)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.image_label)
-
-        botones1 = QHBoxLayout()
-        botones1.addWidget(self.boton_cargar)
-        botones1.addWidget(self.boton_histograma)
-        botones1.addWidget(self.boton_ecualizar)
-        layout.addLayout(botones1)
-
-        botones2 = QHBoxLayout()
-        botones2.addWidget(self.boton_binarizar)
-        botones2.addWidget(self.combo_binarizacion)
-        botones2.addWidget(QLabel("Umbral:"))
-        botones2.addWidget(self.spin_umbral)
-        layout.addLayout(botones2)
-
-        botones3 = QHBoxLayout()
-        botones3.addWidget(self.boton_morfologia)
-        botones3.addWidget(self.combo_morfologia)
-        botones3.addWidget(QLabel("Tamaño:"))
-        botones3.addWidget(self.spin_kernel)
-        layout.addLayout(botones3)
-
-        botones4 = QHBoxLayout()
-        botones4.addWidget(self.boton_esqueleto)
-        botones4.addWidget(self.boton_bordes)
-        botones4.addWidget(self.boton_conteo)
-        botones4.addWidget(self.boton_historial)
-        layout.addLayout(botones4)
-
-        self.setLayout(layout)
-
+        
         self.boton_cargar.clicked.connect(self.cargar_imagen)
         self.boton_histograma.clicked.connect(self.ver_histograma)
         self.boton_ecualizar.clicked.connect(self.ecualizar)
+        self.boton_conteo.clicked.connect(self.conteo)
         self.boton_binarizar.clicked.connect(self.binarizar)
         self.boton_morfologia.clicked.connect(self.aplicar_morfologia)
         self.boton_esqueleto.clicked.connect(self.esqueletizar)
         self.boton_bordes.clicked.connect(self.bordes)
-        self.boton_conteo.clicked.connect(self.conteo)
         self.boton_historial.clicked.connect(self.historial)
+        self.boton_convertir_color.clicked.connect(self.convertir_color)
+
+
+        
+        self.combo_binarizacion.addItems(["binario", "binario_inv", "truncado", "tozero", "tozero_inv"])
+        self.combo_morfologia.addItems(["erosion", "dilatacion", "apertura", "cierre", "gradiente", "tophat", "blackhat"])
+        self.spin_kernel.setRange(1, 21)
+        self.spin_kernel.setValue(5)
+        self.spin_umbral.setRange(0, 255)
+        self.spin_umbral.setValue(125)
 
     def mostrar_imagen(self, img):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
@@ -228,7 +158,8 @@ class InterfazGrafica(QWidget):
         bytes_img = canal * ancho
         qimg = QImage(img_rgb.data, ancho, altura, bytes_img, QImage.Format_BGR888)
         pixmap = QPixmap.fromImage(qimg)
-        self.image_label.setPixmap(pixmap.scaled(self.image_label.width(), self.image_label.height(), Qt.KeepAspectRatio))
+        self.image_label.setPixmap(pixmap.scaled(
+            self.image_label.width(), self.image_label.height(), Qt.KeepAspectRatio))
 
     def cargar_imagen(self):
         ruta, _ = QFileDialog.getOpenFileName(self, "Abrir Imagen", "", "Imagenes (*.png *.jpg *.jpeg)")
@@ -291,51 +222,36 @@ class InterfazGrafica(QWidget):
         mensaje = "\n".join([f"{r['fecha']} - {r['nombre_archivo']} - {r['tecnica_usada']}" for r in registros])
         QMessageBox.information(self, "Historial de Imágenes", mensaje)
 
+    def convertir_color(self):
+        if self.procesador:
+            # Convertimos de RGB a HSV 
+            hsv = cv2.cvtColor(self.imagen_actual, cv2.COLOR_RGB2HSV)
+            self.mostrar_imagen(cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB))
+        else:
+            QMessageBox.warning(self, "Advertencia", "Primero carga una imagen.")
+
+
+
 class LoginUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Login - Proyecto Informática II")
-        self.setGeometry(100, 100, 300, 150)
-
-        self.label_user = QLabel("Usuario:")
-        self.input_user = QLineEdit()
-
-        self.label_pass = QLabel("Contraseña:")
-        self.input_pass = QLineEdit()
-        self.input_pass.setEchoMode(QLineEdit.Password)
-
-        self.btn_login = QPushButton("Ingresar")
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.label_user)
-        layout.addWidget(self.input_user)
-        layout.addWidget(self.label_pass)
-        layout.addWidget(self.input_pass)
-        layout.addWidget(self.btn_login)
-
-        self.setLayout(layout)
+        uic.loadUi(os.path.join(UI_PATH, "login.ui"), self)
 
 class MenuImagenUI(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi("menu_imagen.ui", self)
+        uic.loadUi(os.path.join(UI_PATH, "menu_imagen.ui"), self)
 
+        self.btn_jpg_png.clicked.connect(self.abrir_interfaz_jpg_png)
+
+    def abrir_interfaz_jpg_png(self):
+        self.ventana_jpg_png = InterfazGrafica()
+        self.ventana_jpg_png.show()
 
 class MenuSenalUI(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Menu - Experto en Senales")
-        self.setGeometry(100, 100, 300, 200)
-
-        self.btn_mat = QPushButton("Procesar Senales .MAT")
-        self.btn_csv = QPushButton("Procesar Datos .CSV")
-
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Seleccione el tipo de datos a procesar:"))
-        layout.addWidget(self.btn_mat)
-        layout.addWidget(self.btn_csv)
-        self.setLayout(layout)
-
+        uic.loadUi(os.path.join(UI_PATH, "menu_senal.ui"), self)
 
 
 if __name__ == '__main__':
@@ -345,6 +261,9 @@ if __name__ == '__main__':
     ventana = InterfazGrafica()
     ventana.show()
     sys.exit(app.exec_())
+
+
+
 
 
 

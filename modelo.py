@@ -316,6 +316,25 @@ class ImageProcessor:
             "ruta": self.image_path,
             "tecnica_usada": "Histograma manual RGB"
         }
+    
+    def detectar_circulos(self):
+        gray = cv2.cvtColor(self.img, cv2.COLOR_RGB2GRAY)
+        gray = cv2.medianBlur(gray, 5)
+
+        circulos = cv2.HoughCircles(
+            gray, cv2.HOUGH_GRADIENT, dp=1.2, minDist=20,
+            param1=50, param2=30, minRadius=5, maxRadius=50
+        )
+
+        salida = self.img.copy()
+
+        if circulos is not None:
+            circulos = np.uint16(np.around(circulos))
+            for c in circulos[0, :]:
+                cv2.circle(salida, (c[0], c[1]), c[2], (0, 255, 0), 2)
+
+        return salida
+
 
 class MorfologiaImagen:
     def __init__(self, img):
@@ -416,7 +435,7 @@ class BinarizacionImagen:
         _, img_bin = cv2.threshold(self.img, umbral, max_val, cv2.THRESH_TOZERO_INV)
         return img_bin
 
-#HAGO OTRA CLASE???
+
 # Crear base de datos
 def crear_db():
     """

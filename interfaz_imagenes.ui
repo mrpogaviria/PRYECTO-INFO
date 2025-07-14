@@ -41,6 +41,7 @@ QLabel {
    <item><widget class="QPushButton" name="boton_bordes"><property name="text"><string>Detección de Bordes (Canny)</string></property></widget></item>
    <item><widget class="QPushButton" name="boton_historial"><property name="text"><string>Ver Historial</string></property></widget></item>
    <item><widget class="QPushButton" name="boton_convertir_color"><property name="text"><string>Convertir Espacio de Color</string></property></widget></item>
+   <item><widget class="QPushButton" name="boton_circulos"><property name="text"><string>Detectar Círculos</string></property></widget></item>
 
   </layout>
  </widget>

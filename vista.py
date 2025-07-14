@@ -1,15 +1,16 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMessageBox, QMainWindow, QApplication, QFileDialog
+from PyQt5.QtWidgets import QWidget, QPushButton, QComboBox, QLabel, QVBoxLayout, QLineEdit, QMessageBox, QTableWidget, QMainWindow, QSlider, QHBoxLayout, QApplication, QFileDialog, QHBoxLayout, QSpinBox
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5 import uic
 from modelo import ImageProcessor, MorfologiaImagen, BinarizacionImagen, crear_db, crear_tabla_imagenes, insertar_imagen, obtener_imagenes_procesadas
+import os
 import numpy as np
 import pydicom
 import sys
 import cv2
-import os
+
 
 UI_PATH = os.path.dirname(__file__)
 
@@ -141,6 +142,7 @@ class InterfazGrafica(QWidget):
         self.boton_bordes.clicked.connect(self.bordes)
         self.boton_historial.clicked.connect(self.historial)
         self.boton_convertir_color.clicked.connect(self.convertir_color)
+        self.boton_circulos.clicked.connect(self.detectar_circulos)
 
 
         
@@ -236,6 +238,10 @@ class InterfazGrafica(QWidget):
         else:
             QMessageBox.warning(self, "Advertencia", "Primero carga una imagen.")
 
+    def detectar_circulos(self):
+        if self.procesador:
+            resultado = self.procesador.detectar_circulos()
+            self.mostrar_imagen(resultado)
 
 
 class LoginUI(QWidget):
@@ -267,8 +273,6 @@ if __name__ == '__main__':
     ventana = InterfazGrafica()
     ventana.show()
     sys.exit(app.exec_())
-
-
 
 
 

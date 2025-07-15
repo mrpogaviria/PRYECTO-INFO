@@ -45,12 +45,13 @@ class ModeloSenales:
             INSERT INTO otros_archivos (tipo_archivo, nombre_archivo, ruta_archivo)
             VALUES (%s, %s, %s)
             """
-            cursor.execute(query, ('mat', nombre_archivo, ruta))
+            cursor.execute(query, (tipo, nombre_archivo, ruta))
             conexion.commit()
             cursor.close()
             conexion.close()
-        except mysql.connector.Error as e:
-            print("Error al guardar MAT en la base de datos:", e)
+        except Exception as e:
+            print("[ERROR GUARDAR_REGISTRO]:", e)
+
 
 class ModeloCSV:
     def __init__(self):
@@ -143,14 +144,6 @@ class MySQLDatabase:
         self.conn.commit()
         print("Tabla nifti creada.")
 
-        try:
-            self.cursor.execute("ALTER TABLE nifti_conversion CHANGE dicom_path dicom_folder VARCHAR(255)")
-            self.conn.commit()
-            print("Columna renombrada a dicom_folder.")
-        except Exception as e:
-            print(f"No se pudo cambiar el nombre de la columna (posiblemente ya existe): {e}")
-
-        print("Tabla nifti creada.")
 
     def insertar_nifti(self, datos):
         sql = '''
@@ -508,18 +501,6 @@ def obtener_imagenes_procesadas():
     cursor.close()
     conexion.close()
     return resultados
-
-def crear_tabla_usuarios():
-    conexion = mysql.connector.connect(user='informatica2', password='info20251', host='127.0.0.1', database='info2_PF')
-    cursor = conexion.cursor()
-    sql = '''
-    CREATE TABLE IF NOT EXISTS usuarios (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(100) UNIQUE NOT NULL,
-        password VARCHAR(100) NOT NULL,
-        rol ENUM('imagen', 'senal') NOT NULL
-    )
-    '''
 
 def crear_todas_las_tablas():
     conexion = mysql.connector.connect(

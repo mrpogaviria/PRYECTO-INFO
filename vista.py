@@ -19,6 +19,8 @@ class VisorMatUI(QWidget):
         super().__init__()
         uic.loadUi(os.path.join(UI_PATH, "visor_mat.ui"), self)
 
+        self.setWindowTitle("Visor de Archivos MAT")
+
     
         self.figura = Figure()
         self.canvas = FigureCanvas(self.figura)
@@ -37,6 +39,9 @@ class VisorCSVUI(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi(os.path.join(UI_PATH, "visor_csv.ui"), self)
+
+        self.setWindowTitle("Visor de Archivos CSV")
+
 
         self.figura = Figure()
         self.canvas = FigureCanvas(self.figura)
@@ -254,6 +259,8 @@ class MenuImagenUI(QWidget):
         super().__init__()
         uic.loadUi(os.path.join(UI_PATH, "menu_imagen.ui"), self)
 
+        self.setWindowTitle("Menú Experto Imagen")
+
         self.btn_jpg_png.clicked.connect(self.abrir_interfaz_jpg_png)
 
     def abrir_interfaz_jpg_png(self):
@@ -264,6 +271,10 @@ class MenuSenalUI(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi(os.path.join(UI_PATH, "menu_senal.ui"), self)
+
+        self.setWindowTitle("Menú Experto Señal")
+
+
 
 
 if __name__ == '__main__':

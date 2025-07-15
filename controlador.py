@@ -1,14 +1,15 @@
-from modelo import ModeloCSV, MySQLDatabase, DicomProcessor, ImageProcessor, BinarizacionImagen, MorfologiaImagen, insertar_imagen, obtener_imagenes_procesadas, insertar_usuarios_por_defecto, validar_credenciales, crear_db, crear_todas_las_tablas
+from modelo import ModeloSenales, ModeloCSV, MySQLDatabase, DicomProcessor, ImageProcessor, BinarizacionImagen, MorfologiaImagen, insertar_imagen, obtener_imagenes_procesadas, insertar_usuarios_por_defecto, validar_credenciales, crear_db, crear_todas_las_tablas
 from vista import VisorMatUI, VisorCSVUI, DicomViewer, LoginUI, InterfazGrafica, VisorMatUI, LoginUI, MenuSenalUI, MenuImagenUI
 from PyQt5.QtWidgets import QTableWidgetItem, QApplication, QMessageBox, QFileDialog
 import numpy as np
 import sys
 import scipy.io
-
+import os
 class VisorMatController:
     def __init__(self, vista):
         self.vista = vista
         self.mat_data = None
+        self.modelo = ModeloSenales()
 
         # Conectar botones a sus métodos
         self.vista.btn_graficar.clicked.connect(self.graficar_senal_completa)
@@ -42,6 +43,8 @@ class VisorMatController:
                 self.vista.spin_canal.setMaximum(datos.shape[0] - 1)
                 self.vista.spin_ensayo.setMaximum(datos.shape[2] - 1)
 
+            nombre_archivo = os.path.basename(ruta_archivo)
+            self.modelo.guardar_registro(nombre_archivo, ruta_archivo)
 
         except Exception as e:
             self.vista.mostrar_error(f"Error al cargar el archivo: {str(e)}")
